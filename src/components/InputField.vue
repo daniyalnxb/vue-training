@@ -2,20 +2,20 @@
     import { computed } from 'vue';
 
     const props = defineProps<{
-        todoInput: string;
+        modelValue: string;
         onKeyDown?: (e: KeyboardEvent) => void;
         placeholder: string;
         type: string;
     }>();
 
     const emit = defineEmits<{
-        (e: 'update:todoInput', value: 'string')
+        (e: 'update:modelValue', value: string): void
     }>();
 
     // need to create computed value as props are readonly and we can't update them
     const inputValue = computed({
-        get: () => props.todoInput,
-        set: (value: string) => emit('update:todoInput', value)
+        get: () => props.modelValue,
+        set: (value: string) => emit('update:modelValue', value)
     });
 </script>
 

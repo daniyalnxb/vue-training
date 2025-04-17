@@ -3,8 +3,9 @@
 
   import Button from './components/Button.vue';
   import InputField from './components/InputField.vue';
+  import TodoItem from './components/TodoItem.vue';
 
-  interface Todo {
+  export interface Todo {
     id: number;
     title: string;
     completed: boolean;
@@ -13,9 +14,21 @@
 
   const todos = ref<Todo[]>([]);
   const todosCount = computed<number>(() => todos.value.length);
+  const activeTodosCount = computed<number>(() => todos.value.filter((todo) => todo.completed === false)?.length);
   const todoInput = ref<string>('');
   const id = ref<number>(0);
-  const todosToEdit = ref({});
+  const todosToEdit = ref<Record<number, string>>({});
+  const filter = ref<string>('all');
+  const filteredTodos = computed<Todo[]>(() => {
+    if(filter.value === 'completed') {
+      return todos.value.filter((todo) => todo.completed === true);
+    } else if(filter.value === 'active') {
+      return todos.value.filter((todo) => todo.completed === false);
+    } else {
+      return todos.value
+    }
+  });
+  const clearCompletedTodos = () => todos.value = todos.value.filter((todo) => !todo.completed);
 
   const handleAddTodo = () => {
     if(todoInput.value.trim() === '') {
@@ -67,28 +80,33 @@
     <div class="todo-input-container">
       <InputField
         :onKeyDown="handleKeyDown"
-        v-model:todoInput="todoInput"
+        v-model="todoInput"
         placeholder="Add Todo.."
         type="text"
       />
       <Button class="button" @click="handleAddTodo">Add</Button>
     </div>
     <div v-if="todosCount" class="todo-list-container">
-      <div v-for="todo in todos" :key="todo.id" class="todo-item">
-        <input v-if="!todo.editable" v-model="todo.completed" type="checkbox" />
-        <p v-if="!todo.editable" class="todo-title" :class="todo.completed ? 'complete' : ''">{{ todo.title }}</p>
-        <div v-if="todo.editable" class="editable-view">
-          <input type="text" v-model="todosToEdit[todo.id]" :placeholder="todo.title" />
-          <div class="done" @click="handleEditTodo(todo.id)">☑️</div>
-        </div>
-
-        <div v-if="!todo.editable" class="actions-container">
-          <div title="edit" class="edit" @click="handleEditToggle(todo.id)">🖊️</div>
-          <div title="delete" class="delete" @click="handleDeleteTodo(todo.id)">🗑️</div>
-        </div>
-      </div>
+      <TodoItem
+        v-for="todo in filteredTodos"
+        :key="todo.id"
+        :todo="todo"
+        :todosToEdit="todosToEdit"
+        :handleDeleteTodo="handleDeleteTodo"
+        :handleEditTodo="handleEditTodo"
+        :handleEditToggle="handleEditToggle"
+      />
     </div>
     <p v-else class="empty-list-message">No todos in the list!</p>
+    <div v-if="todosCount" class="todo-list-actions-bar">
+      <p class="completed-count">{{ activeTodosCount }} {{ activeTodosCount < 2 ? 'item' : 'items' }} left</p>
+      <div class="main-actions">
+        <p :class="filter === 'all' ? 'active' : ''" @click="() => filter = 'all'">All</p>
+        <p :class="filter === 'active' ? 'active' : ''" @click="() => filter = 'active'">Active</p>
+        <p :class="filter === 'completed' ? 'active' : ''" @click="() => filter = 'completed'">Completed</p>
+      </div>
+      <p class="clear-completed" @click="clearCompletedTodos">Clear Completed</p>
+    </div>
   </div>
 </template>
 
@@ -118,61 +136,36 @@
       gap: 10px;
       max-width: 50%;
       margin-inline: auto;
+      height: calc(100dvh - 240px);
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
 
-      .todo-item {
+    .todo-list-actions-bar {
+      max-width: 50%;
+      margin-inline: auto;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      p {
+        cursor: pointer;
+        font-weight: 500;
+
+        &.active {
+          color: #007bff;
+        }
+      }
+
+      .completed-count {
+        cursor: default;
+      }
+
+      .main-actions {
         display: flex;
         align-items: center;
         gap: 10px;
-        padding: 10px;
-        border-radius: 10px;
-        background-color: #fff;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-
-        input[type="checkbox"] {
-        }
-
-        .editable-view {
-          width: 100%;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-
-          input[type="text"] {
-            width: 100%;
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            width: 100%;
-            padding: 10px;
-  
-            &:focus {
-              outline: none;
-            }
-          }
-
-          .done {
-            cursor: pointer;
-          }
-        }
-
-
-        .todo-title {
-          width: 100%;
-
-          &.complete {
-            text-decoration: line-through;
-          }
-        }
-
-        .actions-container {
-          display: flex;
-          align-items: center;
-          gap: 5px;
-
-          .edit, .delete {
-            cursor: pointer;
-            font-size: 14px;
-          }
-        }
       }
     }
 
