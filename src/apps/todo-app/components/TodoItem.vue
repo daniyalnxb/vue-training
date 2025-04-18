@@ -1,6 +1,6 @@
 <script setup lang="ts">
-    import { Todo } from '@/App.vue';
-import InputField from './InputField.vue';
+    import { Todo } from '../Todo.vue';
+    import InputField from './InputField.vue';
 
     const { todo, todosToEdit, handleDeleteTodo, handleEditTodo, handleEditToggle} = defineProps<{
         todo: Todo;
