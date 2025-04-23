@@ -54,6 +54,11 @@ a:visited {
   color: white;
   opacity: 0.7;
   transition: 0.2 ease color;
+  
+  h2 {
+    font-size: 1rem;
+    margin-block: 0;
+  }
 }
 #nav a.router-link-active,
 #nav a:hover {
