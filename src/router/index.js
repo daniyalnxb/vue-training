@@ -25,7 +25,7 @@ const routes = [
             }
         },
         children: [
-            // Before it was the sibiling root, but now we make this route the children of destination.show route
+            // Before it was the sibiling route, but now we make this route the children of destination.show route
             { 
                 path: ':experienceSlug',
                 name: 'experience.show',
@@ -44,6 +44,18 @@ const routes = [
 const router = createRouter({
     history: createWebHistory(),
     routes,
+    scrollBehavior (to, from, savedPosition) {
+        return savedPosition || new Promise((resolve) => {
+            setTimeout(() => {
+                resolve({ top: 0, behavior: 'smooth' })
+            }, 300)
+        }) // saved position will enable the default scroll behavior of the browser
+        // return {
+        //     top: null,
+        //     left: null,
+        //     behavior: 'smooth'
+        // }
+    }
     // linkActiveClass: 'active-link' // to rename router-link-active class
 });
 

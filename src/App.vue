@@ -11,7 +11,7 @@
   <!-- router view component, is functioal component render the match component for a match path -->
  <div class="container">
    <router-view v-slot="{Component}">
-     <transition name="slide" mode="out-in">
+     <transition name="fade" mode="out-in">
       <component :is="Component" :key="route.fullPath"></component>
      </transition>
    </router-view>
