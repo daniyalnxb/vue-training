@@ -1,28 +1,15 @@
 <script setup>
-    import { computed, onMounted, ref, watch } from 'vue';
-    import { useRoute } from 'vue-router';
-
+    import { computed } from 'vue';
     import { destinations } from '@/destinations-data';
 
-    const route = useRoute();
-    const destinationId = computed(() => parseInt(route.params.id));
-    // const destination = computed(() => destinations?.find((dest) => dest.id === destinationId.value));
-    // here we no longer need the computed property destination as we are fetching it from server.
-    const destination = ref(null);
-    const baseUrl = 'https://travel-dummy-api.netlify.app';
+    import ExperienceCard from '@/components/ExperienceCard.vue';
 
-    const fetchDestinationData = async () => {
-        const response = await fetch(`${baseUrl}/${route.params.slug}`);
-        destination.value = await response.json();
-    }
-
-    onMounted(() => {
-        fetchDestinationData();
+    const props = defineProps({
+        // id: { type: String, required: true },
+        id: { type: Number, required: true },
     });
 
-    watch(() => route.params, async () => {
-        fetchDestinationData();
-    });
+    const destination = computed(() => destinations?.find((dest) => dest.id === props.id));
 </script>
 
 <template>
@@ -33,6 +20,20 @@
                 <img :src="`/images/${destination?.image}`" :alt="destination?.name">
                 <p>{{ destination?.description }}</p>
             </div>
+        </div>
+    </section>
+    <section class="experiences">
+        <h2>Top Experiences in {{ destination?.name }}</h2>
+        <div class="cards">
+            <router-link
+                v-for="experience in destination?.experiences"
+                :key="experience?.slug"
+                :to="{name: 'experience.show', params: {experienceSlug: experience.slug}}"
+            >
+                <ExperienceCard
+                    :experience="experience"
+                />
+            </router-link>
         </div>
     </section>
     <h1 v-if="!destination">No data found</h1>
