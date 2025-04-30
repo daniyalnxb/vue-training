@@ -10,14 +10,17 @@ const routes = [
         name: 'destination.show',
         component: () => import('@/views/DestinationShow.vue') ,
         // props: true, // it automatically maps route params to component props
-        props: (route) => ({ ...route.params, id: parseInt(route.params.id) })
+        props: (route) => ({ ...route.params, id: parseInt(route.params.id) }),
+        children: [
+            // Before it was the sibiling root, but now we make this route the children of destination.show route
+            { 
+                path: ':experienceSlug',
+                name: 'experience.show',
+                component: () => import('@/views/ExperienceShow.vue') ,
+                props: (route) => ({ ...route.params, id: parseInt(route.params.id) })
+            }
+        ]
     },
-    { 
-        path: '/destination/:id/:slug/:experienceSlug',
-        name: 'experience.show',
-        component: () => import('@/views/ExperienceShow.vue') ,
-        props: (route) => ({ ...route.params, id: parseInt(route.params.id) })
-    }
 ];
 
 const router = createRouter({
