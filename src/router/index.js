@@ -21,6 +21,11 @@ const routes = [
             }
         ]
     },
+    {
+        path: '/:pathMatch(.*)*', // must use this regex to match all paths in vue router 4
+        name: 'NotFound',
+        component: () => import('@/views/NotFound.vue')
+    }
 ];
 
 const router = createRouter({
